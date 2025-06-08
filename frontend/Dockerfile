@@ -4,7 +4,7 @@ FROM node:21 AS frontend-builder
 # Set the working directory to /app
 WORKDIR /app
 
-# Copy the package.json and package-lock.json for dependency installation
+# Copy package.json and package-lock.json first to leverage Docker's cache
 COPY package*.json ./
 
 # Install dependencies
@@ -20,14 +20,13 @@ FROM node:21-slim
 WORKDIR /app
 
 # Copy built assets and dependencies from frontend-builder stage
-COPY --from=frontend-builder /app .
+COPY --from=frontend-builder /app ./
 
-# Copy the .env.sample file to .env.local
+# Copy .env.docker to .env.local
 COPY .env.docker .env.local
 
-# Expose port 5173 for the Node.js application
+# Expose port for the Node.js application
 EXPOSE 5173
 
-# Define the default command to run the application in development mode
+# Run the app in development mode
 CMD ["npm", "run", "dev", "--", "--host"]
-

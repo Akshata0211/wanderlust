@@ -1,31 +1,32 @@
 # Stage 1
 FROM node:21 AS backend-builder
 
-# setup the working dir
+# Set the working directory
 WORKDIR /app
 
-# code
-COPY . .
+# Copy package.json and package-lock.json first
+COPY package*.json ./
 
-# packages install
-RUN npm i
+# Install dependencies
+RUN npm install
 
-# tests
+# Run tests (optional)
 RUN npm run test
 
 # Stage 2
 FROM node:21-slim
 
-# setup the working dir
+# Set the working directory
 WORKDIR /app
 
-# copy the above stage as compressed
-COPY --from=backend-builder /app .
+# Copy the application code from backend-builder stage
+COPY --from=backend-builder /app ./
 
+# Copy environment file
 COPY .env.docker .env
 
-# Port
+# Expose the backend API port
 EXPOSE 5000
 
-# App
+# Start the backend app
 CMD ["npm", "start"]
