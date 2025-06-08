@@ -1,4 +1,4 @@
-# sec-cicd-jenkins
+# jenkins-cicd-secure
 
 This repository sets up a **CI/CD pipeline** for secure and efficient application development using the following tools:
 
@@ -80,14 +80,14 @@ sudo apt-get update
 sudo apt-get install trivy -y
 ```
 
-Step 5: Jenkins Plugin Setup
+### Step 5: Jenkins Plugin Setup
 Install plugins: `manage jenkins > plugins`
 - SonarQube Scanner
 - Sonar Quality Gates
 - OWASP Dependency-Check
 - Docker
 
-Give Jenkins permission to access Docker and Restart:
+#### Give Jenkins permission to access Docker and Restart:
 
 ```bash
 sudo usermod -aG docker jenkins
@@ -97,16 +97,18 @@ sudo systemctl restart jenkins
 
 ### Step 6: Security Group Configuration
 Ensure your security groups in AWS EC2 allow the following ports:
+```bash
 - Jenkins: 8080
 - SonarQube: 9000
 - Web Application: 5173
+```
 
 ### Step 7: SonarQube Configuration
 
-1. Create a token on SonarQube:
+1. **Create a token on SonarQube:**
   - Go to `Administration > Security > Users > Administrator`
   - Generate a new token and copy it.
-2. Set up a Webhook in SonarQube to notify Jenkins:
+2. **Set up a Webhook in SonarQube to notify Jenkins:**
   - Go to `Administration > Configuration > Webhooks`
   - Enter the URL: `http://ec2-public-ip:8080/sonarqube-webhook/`
 
@@ -114,32 +116,36 @@ Ensure your security groups in AWS EC2 allow the following ports:
 
 In Jenkins:
 
-1. Add SonarQube Token:
+1. **Add SonarQube Token:**
   - Go to `Jenkins Dashboard > Manage Jenkins > Manage Credentials > (Select Global) > Add Credentials`
   - Choose `Kind: Secret Text` then Enter a name, such as Sonar in the ID field and enter the SonarQube token.
 
-2. Configuration in Jenkins:
+2. **Configuration in Jenkins:**
   - Go to `Jenkins Dashboard > Manage Jenkins > Configure System`
-  - Click add Jenkins URL
-   - Jekins URL: `http://<your-ec2-public-ip>:8080/`
-  - Click add SonarQube Scanner.
-    - In `SonarQube servers`, enter the details of your SonarQube server:
-       - Name: Sonar
-       - URL: `http://<your-ec2-public-ip>:9000/` (SonarQube URL).
-       - Token: Select the Sonar token credential you added earlier (e.g., Sonar).
+   - Click add Jenkins URL
+     - Jekins URL: `http://<your-ec2-public-ip>:8080/`
+   - Click add SonarQube Scanner.
+      - In `SonarQube servers`, enter the details of your SonarQube server:
+      - Name: Sonar
+      - URL: `http://<your-ec2-public-ip>:9000/` (SonarQube URL).
+      - Token: Select the Sonar token credential you added earlier (e.g., Sonar).
 
-3. Configure Tools:
+3. **Configure Tools:**
   - Go to `Jenkins Dashboard > Manage Jenkins > Global Tool Configuration`
-  - Click `Add SonarQube Scanner`> Enter `Sonar` as the Name> Check the box for Install automatically and select the latest version.
-  - Click `Add Dependency-Check` > Enter `dc` as the Name > Check the box for Install automatically and select the latest version
+  - Click `Add SonarQube Scanner`
+    - Enter `Sonar` as the Name
+    - Check the box for Install automatically and select the latest version.
+  - Click `Add Dependency-Check` 
+    - Enter `dc` as the Name 
+    - Check the box for Install automatically and select the latest version
 
-4. Create a New Pipeline:
+4. **Create a New Pipeline:**
   - Go to the `Jenkins Dashboard > New Item`
-  - Definition: Select `Pipeline script from SCM.`
-  - SCM: Choose `Git`
-  - Repository URL: Enter your Git repository URL
-  - Branch: Enter `main`
-  - Script Path: Enter `Jenkinsfile`(or your custom pipeline script name if different)
+    - Definition: Select `Pipeline script from SCM.`
+    - SCM: Choose `Git`
+    - Repository URL: Enter your Git repository URL
+    - Branch: Enter `main`
+    - Script Path: Enter `Jenkinsfile`(or your custom pipeline script name if different)
 
 ### Step 9: Access Website
 You can access the web application at:
@@ -148,14 +154,18 @@ You can access the web application at:
 #### Why These Tools?
 
 1. **SonarQube Scan**
+
 SonarQube is essential for continuous code quality checks. It performs static analysis of your codebase, identifying bugs, vulnerabilities, and code smells. It also promotes best practices and coding standards across your team.
 
 2. **SonarQube Quality Gates**
+
 Quality Gates in SonarQube act as checkpoints. They define criteria for code quality, ensuring that your code meets specific thresholds before being deployed. This ensures that your production code is always of high quality.
 
 3. **OWASP Dependency-Check**
+
 The OWASP Dependency-Check plugin in Jenkins helps to identify known vulnerabilities in your project dependencies. By analyzing the libraries used in your project, it detects security flaws and helps you ensure that you're not deploying insecure software.
 
 4. **Trivy**
+
 Trivy is a security scanner that helps to detect vulnerabilities in your container images. By integrating Trivy into your CI/CD pipeline, you can ensure that no security risks are introduced during containerization.
 
