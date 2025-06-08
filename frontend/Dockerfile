@@ -7,7 +7,17 @@ WORKDIR /app
 # Copy package.json and package-lock.json first to leverage Docker's cache
 COPY package*.json ./
 
-# Install dependencies
+# Ensure we're using the latest npm version
+RUN npm install -g npm@latest
+
+# Clean npm cache
+RUN npm cache clean --force
+
+# Remove existing node_modules and package-lock.json if needed
+RUN rm -rf node_modules
+RUN rm -f package-lock.json
+
+# Install dependencies (using legacy peer deps to resolve conflicts)
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code
