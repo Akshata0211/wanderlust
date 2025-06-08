@@ -7,9 +7,6 @@ WORKDIR /app
 # Copy package.json and package-lock.json first to leverage Docker's cache
 COPY package*.json ./
 
-# Ensure we're using the latest npm version
-RUN npm install -g npm@latest
-
 # Clean npm cache
 RUN npm cache clean --force
 
