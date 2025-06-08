@@ -36,8 +36,7 @@ pipeline{
         }
         stage("Deploy using Docker compose"){
             steps{
-                sh "docker-compose down --volumes --remove-orphans"
-                sh "docker-compose up --build --no-cache -d"
+                sh "docker-compose up -d"
             }
         }
     }
